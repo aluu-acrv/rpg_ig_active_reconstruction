@@ -18,21 +18,24 @@
 #include "flying_gazebo_stereo_cam/controller.hpp"
 
 #include "ros/ros.h"
-#include "gazebo_msgs/SetModelState.h"
-#include "gazebo_msgs/GetModelState.h"
+#include "gazebo_msgs/SetModelState.h"  //auto generated header file by srv
+#include "gazebo_msgs/GetModelState.h"  //...
 #include <movements/ros_movements.h>
 #include <stdexcept>
+
+#include "std_msgs/String.h" 
 
 namespace flying_gazebo_stereo_cam
 {
   
-  Controller::Controller(std::string cam_model_name)
-  : cam_model_name_(cam_model_name)
+  Controller::Controller( ros::NodeHandle nh, std::string cam_model_name )
+  : nh_(nh)
+  , cam_model_name_(cam_model_name)
   , has_moved_(false)
   , keepPublishing_(false)
   , cam_to_image_(0.5,0.5,-0.5,0.5)
   {
-    
+	pose_publisher_ = nh_.advertise<geometry_msgs::Pose>("/robot_pose/moveto", 1);  // publisher and topic for robot_trajectory package 
   }
   
   Controller::~Controller()
@@ -58,6 +61,12 @@ namespace flying_gazebo_stereo_cam
     
     bool response = ros::service::call( "/gazebo/set_model_state", srv_call );
     
+    // addup, publish new_pose topic to Moveit! 
+    geometry_msgs::Pose pose; 
+    pose = movements::toROS( new_pose );
+    pose_publisher_.publish( pose );  // publish robot pose to robot_trajectory package, along with Gazebo  
+    ros::spinOnce();
+ 
     return srv_call.response.success;
   }
   

@@ -42,13 +42,13 @@ int main(int argc, char **argv)
   
   using namespace flying_gazebo_stereo_cam;
   
-  // Controller
+  // Controller (create an object to interface with robot about how to move)
   //------------------------------------------------------------------
-  std::shared_ptr<Controller> controller = std::make_shared<Controller>(model_name);
+  std::shared_ptr<Controller> controller = std::make_shared<Controller>(nh,model_name);
   // publish tf
   controller->startTfPublisher(camera_frame_name,world_frame_name);
   
-  // Iar communication interface
+  // Iar communication interface (create another object to take data from ROS)
   //------------------------------------------------------------------
   boost::shared_ptr<CommunicationInterface> robot_interface = boost::make_shared<CommunicationInterface>(nh,controller,sensor_in_topic,sensor_out_name);
   

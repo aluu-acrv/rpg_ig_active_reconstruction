@@ -29,57 +29,62 @@ namespace ros_tools
   {
     pcl_subscriber_ = nh_.subscribe( in_name,1, &PclRerouter::pclCallback, this );
     pcl_publisher_ = nh_.advertise<sensor_msgs::PointCloud2>(out_name, 1);
+    // pcl_publisher_ = nh_.advertise<sensor_msgs::PointCloud2>("out_pcl", 1); // BILAL, cannot be directly named 'out' in namespace 
     pcl_service_caller_ = nh_.serviceClient<ig_active_reconstruction_msgs::PclInput>(out_name);
   }
   
   bool PclRerouter::rerouteOneToTopic(ros::Duration max_wait_time)
   {
+    std::cout<< "+++++++ rerouteOneToTopic bool ++++++++" << std::endl;
     has_published_one_ = false;
     forward_one_ = true;
-    ros::spinOnce();
+    ros::spinOnce(); // call pclCallback has_published_one = true 
     
     ros::Time time_limit = ros::Time::now() + max_wait_time;
     ros::Duration sleep_time;
     sleep_time.fromNSec(max_wait_time.toNSec()/10);
     
-    while(!has_published_one_ && ros::Time::now()<time_limit)
+    while(!has_published_one_ && ros::Time::now()<time_limit) // double check if pclCallback not called 
     {
-      ros::spinOnce();
+      ros::spinOnce(); 
       sleep_time.sleep();
     }
-    forward_one_ = false;
+    forward_one_ = false; // boolean variable to reroute a single point cloud at indicated NBV pose 
     
     return has_published_one_;
   }
   
   bool PclRerouter::rerouteOneToSrv()
   {
-    has_published_one_ = false;
+    std::cout<< "+++++++ rerouteOneToSrv bool ++++++++" << std::endl;
+    has_published_one_ = false; // service_responce_ is kept true to call the service 
     one_to_srv_ = true;
-    ros::spinOnce();
+    ros::spinOnce(); // call pclCallback 
     
     while( one_to_srv_ && nh_.ok() )
     {
-      ros::spinOnce();
+      ros::spinOnce(); 
       ros::Duration(0.01).sleep();
     }
-    return service_response_;
+    return service_response_; // true 
   }
   
   void PclRerouter::pclCallback( const sensor_msgs::PointCloud2ConstPtr& msg )
   {
-    if(forward_one_)
+    std::cout << "+++++++ forward_one_ in pclCallback: " << forward_one_ << std::endl;
+    if(forward_one_) 
     {
-      pcl_publisher_.publish(msg);
+      pcl_publisher_.publish(msg); // advertise topic  
       has_published_one_ = true;
       forward_one_ = false;
     }
-    else if(one_to_srv_)
+    else if(one_to_srv_) // call service simutaneously with topic
     {
+      std::cout << "+++++++ one_to_srv_ in pclCallback: " << one_to_srv_ << std::endl;
       ig_active_reconstruction_msgs::PclInput call;
       call.request.pointcloud = *msg;
       pcl_service_caller_.call(call);
-      service_response_ = call.response.success;
+      service_response_ = call.response.success; // assign service_response_ true 
       one_to_srv_ = false;
     }
     

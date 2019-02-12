@@ -56,6 +56,8 @@ namespace ros_tools
     ros::Subscriber pcl_subscriber_;
     ros::Publisher pcl_publisher_;
     ros::ServiceClient pcl_service_caller_;
+
+    //ros::Publisher mesh_publisher_; // 
     
     bool forward_one_;
     bool has_published_one_;

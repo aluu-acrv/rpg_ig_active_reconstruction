@@ -17,10 +17,12 @@ find_package(catkin REQUIRED COMPONENTS
   gazebo_msgs
   geometry_msgs
   sensor_msgs
+  pcl_ros 
 )
 
 find_package(Eigen REQUIRED)
 find_package(Boost REQUIRED)
+#find_package(PCL REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
@@ -35,6 +37,7 @@ catkin_package(
     movements
     geometry_msgs
     sensor_msgs
+    pcl_ros
   DEPENDS
     Eigen
     Boost
@@ -44,6 +47,7 @@ include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${Eigen_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
+  #${PCL_INCLUDE_DIRS}
 )
 
 file(GLOB ${PROJECT_NAME}_CODE_BASE
@@ -57,6 +61,7 @@ add_library(${PROJECT_NAME} STATIC
 target_link_libraries(${PROJECT_NAME}
    ${catkin_LIBRARIES}
    ${Boost_LIBRARIES}
+   #${PCL_LIBRARIES}
 )
 
 # Executables...........................................................
@@ -72,3 +77,21 @@ target_link_libraries(robot_interface
 add_dependencies(robot_interface
  ${catkin_EXPORTED_TARGETS}
 )
+
+# Executables...........................................................
+
+add_executable(rs_camera
+  src/ros_nodes/rs_camera.cpp
+  ${${PROJECT_NAME}_CODE_BASE}
+)
+target_link_libraries(rs_camera
+   ${catkin_LIBRARIES}
+   ${Boost_LIBRARIES}
+   #${PCL_LIBRARIES}
+)
+add_dependencies(rs_camera
+ ${catkin_EXPORTED_TARGETS}
+)
+
+
+

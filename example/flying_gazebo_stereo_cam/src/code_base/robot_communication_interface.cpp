@@ -48,11 +48,18 @@ namespace flying_gazebo_stereo_cam
     return current_view;
   }
   
-  CommunicationInterface::ReceptionInfo CommunicationInterface::retrieveData()
+  CommunicationInterface::ReceptionInfo CommunicationInterface::retrieveData() // AND logic does not work due to timing constrains
   {
-    if( pcl_rerouter_.rerouteOneToSrv() )
+    if( pcl_rerouter_.rerouteOneToSrv() ) // if true, service is called 
     {
-      return ReceptionInfo::SUCCEEDED;
+       std::cout << "++++++++++ Communication_interface: rerouteOneToService is true +++++ " << std::endl;
+
+      if(pcl_rerouter_.rerouteOneToTopic() ) // nested if, true, topic is also advertised to topic pcl_input
+      {
+        std::cout << "++++++++++ Communication_interface: rerouteOneToTopic is true +++++ " << std::endl; // try ROS:Debug-ROS:Error message 
+        
+      }
+      return ReceptionInfo::SUCCEEDED; // return only ONCE if true 
     }
     return ReceptionInfo::FAILED;
   }

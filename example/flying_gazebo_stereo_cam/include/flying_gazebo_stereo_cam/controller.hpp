@@ -35,7 +35,7 @@ namespace flying_gazebo_stereo_cam
     /*! Constructor.
      * @param cam_model_name Name of the spawned model in gazebo. Used to identify it.
      */
-    Controller(std::string cam_model_name);
+    Controller(ros::NodeHandle nh, std::string cam_model_name);
     
     /*! Stops the thread on destruction.*/
     virtual ~Controller();
@@ -65,6 +65,9 @@ namespace flying_gazebo_stereo_cam
     /*! Tf publishing thread.
      */
     virtual void keepPublishing(std::string camera_frame_name, std::string world_frame_name);
+
+    ros::NodeHandle nh_;
+    ros::Publisher pose_publisher_;
     
   private:
     std::string cam_model_name_;

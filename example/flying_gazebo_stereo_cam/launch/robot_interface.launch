@@ -25,7 +25,7 @@
   </node>
   
   <!-- stereo image processing node -->
-  <include file="$(find flying_gazebo_stereo_cam)/launch/stereo_processing.launch" />
+  <!-- <include file="$(find flying_gazebo_stereo_cam)/launch/stereo_processing.launch" /> -->
   
   <!-- Viewspace module -->
   <include file="$(find flying_gazebo_stereo_cam)/launch/simple_viewspace_module.launch" />
